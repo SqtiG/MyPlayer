@@ -1,0 +1,51 @@
+name: Zbuduj APK
+
+# Uruchamia się po każdym wgraniu zmian do repozytorium oraz ręcznie (Actions -> Zbuduj APK -> Run workflow).
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Potrzebne, żeby workflow mógł utworzyć "Release" z plikiem APK
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobierz kod
+        uses: actions/checkout@v4
+
+      - name: Zainstaluj Javę
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Instaluje Android SDK i akceptuje licencje; brakującą platformę (API 37) Gradle dociągnie sam
+      - name: Zainstaluj Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Przygotuj Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Zbuduj APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+      # Plik do pobrania z karty Actions (przechowywany 90 dni)
+      - name: Zapisz APK jako artefakt
+        uses: actions/upload-artifact@v4
+        with:
+          name: MojOdtwarzacz-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      # Plik do pobrania z karty Releases – wygodny link na telefon
+      - name: Utwórz wydanie z plikiem APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Wersja testowa ${{ github.run_number }}
+          files: app/build/outputs/apk/debug/app-debug.apk

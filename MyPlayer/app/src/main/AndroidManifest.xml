@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Odczyt plików audio (Android 13+: READ_MEDIA_AUDIO, starsze: READ_EXTERNAL_STORAGE) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!-- Powiadomienie odtwarzacza (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Usługa pierwszoplanowa odtwarzania muzyki -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Bluetooth: lista sparowanych urządzeń i odbiór zdarzeń połączenia -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+
+    <application
+        android:name=".MusicApp"
+        android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyPlayer">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Usługa odtwarzania (Media3). Obsługuje powiadomienie, przyciski słuchawek/samochodu i autostart -->
+        <service
+            android:name=".playback.PlaybackService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
+        </service>
+
+        <!-- Pozwala wznowić muzykę przyciskiem "play" w samochodzie/słuchawkach, gdy aplikacja nie działa -->
+        <receiver
+            android:name="androidx.media3.session.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Połączenie / rozłączenie urządzenia Bluetooth -> uruchomienie trybu -->
+        <receiver
+            android:name=".bluetooth.BluetoothReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

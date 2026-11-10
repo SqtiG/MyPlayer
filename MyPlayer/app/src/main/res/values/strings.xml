@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mój Odtwarzacz</string>
+    <string name="channel_playback">Odtwarzanie muzyki</string>
+    <string name="channel_prompt">Połączenie z urządzeniem Bluetooth</string>
+    <string name="notif_connecting">Łączenie z urządzeniem audio…</string>
+</resources>
