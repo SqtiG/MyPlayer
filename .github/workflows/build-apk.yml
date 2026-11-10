@@ -27,9 +27,10 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # Instaluje Android SDK i akceptuje licencje; brakującą platformę (API 37) Gradle dociągnie sam
-      - name: Zainstaluj Android SDK
-        uses: android-actions/setup-android@v3
+      # Android SDK jest już na runnerze ubuntu-latest; akceptujemy licencje,
+      # a brakującą platformę (API 37) Gradle dociągnie sam
+      - name: Zaakceptuj licencje Android SDK
+        run: yes | sdkmanager --licenses > /dev/null || true
 
       - name: Przygotuj Gradle
         uses: gradle/actions/setup-gradle@v4
